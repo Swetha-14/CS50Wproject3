@@ -1,0 +1,49 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Categories
+{% endblock %}
+
+{% block body %}
+    <h2>Categories</h2>
+    <br>
+    <br>
+    <div class="row justify-content-center">
+      <div class="column">
+        <a href="{% url 'choice' "F" %}" class="text-dark">
+          <div class="card"><h3><b>Fashion</b></h3></div></a>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class = "row justify-content-center">
+      <div class = "column">
+        <a href="{% url 'choice' "T" %}" class="text-dark">
+          <div class="card"><h3><b>Toys</b></h3></div></a>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class = "row justify-content-center">
+      <div class = "column">
+        <a href="{% url 'choice' "E" %}" class="text-dark">
+          <div class="card"><h3><b>Electronics</b></h3></div></a>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class = "row justify-content-center">
+      <div class = "column">
+        <a href="{% url 'choice' "H" %}" class="text-dark">
+          <div class="card"><h3><b>Home</b></h3></div></a>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class = "row justify-content-center">
+      <div class = "column">
+        <a href="{% url 'choice' "O" %}" class="text-dark">
+          <div class="card"><h3><b>Other</b></h3></div></a>
+      </div>
+    </div>
+{% endblock %}

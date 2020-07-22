@@ -1,0 +1,49 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Watchlist
+{% endblock %}
+
+{% block body %}
+    <h2>Your Watchlist</h2>
+	<br/><br/>
+	{% if user.is_authenticated %}
+		
+		{% if not listings %}
+			<h3> You have not added any items in your watchlist yet !!</h3>
+        {% else %}
+		<div class="row justify-content-center">
+			{% for listing in listings %}
+            <a href="{% url 'listing' listing.id %}" class="listing-card card justify-content-center col-10 col-sm-5">
+                <div class="card-body text-center">
+                    <img class="listing-image" src="{{ listing.item_slug }}" alt="{{listing.title}}">
+                    <p><small class="text-muted">{{ listing.description }}</small></p>
+                </div>
+                <div class="card-footer">
+                    <div>
+                        <strong style="font-size: x-large;">{{ listing.title }}</strong>
+                        <span class="status status-{{ listing.active }}">
+                            {% if listing.active %}
+                                Active
+                            {% else %}
+                                Closed
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% for bid in current_bids %}
+                        {% if bid.listing == listing.id %}
+                            <div class="price mt-1" style="font-size:x-large;"><strong><mark>${{ bid.value }}</mark></strong></div>
+                        {% endif %}
+                    {% endfor %}
+                    <small>Created at: {{listing.created_date}}</small>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    
+    {% else %}
+		<h3><strong>Log in</strong> to add your items in your Watchlist !</h3>
+    {% endif %}
+
+{% endblock %}
