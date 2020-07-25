@@ -27,7 +27,7 @@ for listing in listings:
 
 def index(request):
     return render(request, "auctions/index.html",{
-        "listings":listings,
+        "listings":Auctionlisting.objects.filter(active=True),
         "current_bids":current_bids
     })
 
@@ -89,9 +89,13 @@ def category(request):
 
 def choices(request, letter):
     choice = Auctionlisting.objects.filter(category=letter)
+    if choice:
+        for i in choice:
+            name = i.get_category_display
     return render(request, "auctions/choice.html",{
         "listings":choice,
-        "current_bids":current_bids
+        "current_bids":current_bids,
+        "name":name
     })
 
 def watchlist(request):
@@ -121,11 +125,10 @@ def create(request):
             "messages": form.errors.as_data
         })  
     
-    Create_form = CreateForm()
-
     return render(request, "auctions/create.html", {
-        "form": Create_form
+        "form": CreateForm()
     })
+
 
 def listing(request, id):
     listing = Auctionlisting.objects.get(pk=id)
@@ -137,11 +140,11 @@ def listing(request, id):
 
     recent_bid = None 
     if listing.bids.exists():
-        print("*************************")
-        print(listing.bids.all())
         bids = listing.bids.all().order_by("id").reverse()
         recent_bid = bids[0].bid_amount
-    
+    category = listing.category
+    if category:
+        name = listing.get_category_display
 
     if request.method == "POST":
         if not request.user.is_authenticated:
@@ -204,22 +207,27 @@ def listing(request, id):
                     listings.add(listing)
                 return HttpResponseRedirect(reverse("listing", args=[listing.id]))
 
-        if not listing.active:
-            if listing.bids.exists():
-                last_bid = listing.bids.all().order_by("id").reverse()[0]
-                winner = request.user.id == last_bid.user.id
+    if not listing.active:
+        if listing.bids.exists():
+            last_bid = listing.bids.all().order_by("id").reverse()[0]
+            winner = request.user.id == last_bid.user.id
             
-            else:
-                winner = False
-            return render(request, "auctions/listing.html", {
-                "listing": listing,
-                "current_bid": recent_bid or listing.starting_bid,
-                "watchlisted": watchlist,
-                "user_is_winner": winner
+        else:
+            winner = False
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "current_bid": recent_bid or listing.starting_bid,
+            "watchlisted": watchlist,
+            "user_is_winner": winner,
+            "name":name,
+            "category":category 
             })
 
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "current_bid":recent_bid or listing.starting_bid,
-        "watchlisted": watchlist
-    })
+        "watchlisted": watchlist,
+        "name":name,
+        "category":category
+    }) 
+

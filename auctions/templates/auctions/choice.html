@@ -1,16 +1,15 @@
 {% extends "auctions/layout.html" %}
 
 {% block title %}
-	{{Category}}
+	{{name}}
 {% endblock %}
 
 {% block body %}
     <hr class="soften">
-    {% for listing in listings %}
-    <h2>Active Listings in <strong class="text-danger">{{listing.get_category_display}}</strong></h2>
+    <h2>Active Listings in <b class="text-danger">{{name}}</b></h2>
     <br/><br/>
     <div class="row justify-content-center">
-        
+        {% for listing in listings %}
                 <a href="{% url 'listing' listing.id %}" class="listing-card card justify-content-center col-10 col-sm-5">
                     <div class="card-body text-center">
                         <img class="listing-image" src="{{ listing.item_slug }}" alt="{{listing.title}}">

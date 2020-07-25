@@ -6,7 +6,7 @@
 
 {% block body %}
     <h2>Create Listing</h2>
-    <br/><br/>
+    <br/>
     {% for message in messages %}
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             {{ message }}
@@ -15,7 +15,7 @@
             </button>
         </div>
     {% endfor %}
-    
+
     <div class="form-group">
         <form action = "{% url 'create' %}" method="post">
             {% csrf_token %}
@@ -24,7 +24,3 @@
         </form>
     </div>
 {% endblock %}
-<!--.form-field {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}-->

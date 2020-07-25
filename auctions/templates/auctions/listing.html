@@ -5,121 +5,111 @@
 {% endblock %}
 
 {% block body %}
-    <h2>Listing: <b>{{listing.title}}</b></h2>
-    <br/><br/>
+    <h2>Listing: <b>{{listing.title}}</b> <span style="font-size:large;" class="status status-{{ listing.active }}">
+        {% if listing.active %}
+            Active
+        {% else %}
+            Closed
+        {% endif %}
+    </span>
+    <span>
+        {% if watchlisted %}
+            <div class="mb-3" style="font-size:large;"><a href="#"><span class="badge badge-warning mr-1">Watchlist</span></a></div>
+        {% endif %}
+    </span></h2>
+    
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
         {% endfor %}
     {% endif %}
+    
     <main class="mt-5 pt-4">
         <div class="container dark-grey-text mt-5">
             <div class="row wow fadeIn">
                 <div class="col-md-6 mb-4">
-                    <img src="{{listing.item_slug}}" class="img-fluid" alt="{{listing.title}}">
+                    <img src="{{listing.item_slug}}" class="img-fluid" alt="{{listing.title}}" style="width: auto;">
                 </div>
-                <div class="col-md-6 mb-4">
-                    <div class="p-4">
-                        
+                <div class="col-md-6 mb-6">
+                    <div class="container1">
+                        {% if listing.active and listing.user.id == user.id %}
+                        <form action="{% url 'listing' listing.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="type" value="close">
+                            <button type="submit" class="btn btn-danger btn-sm">Close the listing</button>
+                        </form>
+                        {% endif %}
                         <form action="{% url 'listing' listing.id %}" method="post">
                             {% csrf_token %}
                             <input type="hidden" name="type" value="watchlist">
                             <button type="submit" class="btn btn-secondary btn-sm">
                                 {% if watchlisted %}
-                                    <div class="mb-3"><a href="#"><span class="badge grey mr-1">Watchlist</span></a></div>
                                     Remove from watchlist
                                 {% else %}
                                     Add to watchlist
                                 {% endif %}
                             </button>
                         </form>
-                        
-                        <span class="status status-{{ listing.active }}">
-                            {% if listing.active %}
-                                active
-                            {% else %}
-                                closed
-                            {% endif %}
-                        </span>
-                        
-                        {% if listing.active and listing.user.id == user.id %}
-                            <form action="{% url 'listing' listing.id %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="type" value="close">
-                            <button type="submit" class="btn btn-danger btn-sm">Close the listing</button>
-                            </form>
-                        {% endif %}
+                    </div>
                         
                         <p class="lead font-weight-bold">Description</p>
                         <p>{{listing.description|linebreaks}}</p>
-                        <p class="lead"><strong>Current biding: <span class="current_bid"><mark>${{ current_bid }}</mark></span></strong></p>
+                        <p class="lead"><strong>Current biding: <span class="current_bid"><mark style="font-size:xx-large;">${{ current_bid }}</mark></span></strong></p>
                         
                         {% if listing.active %}
-                            <div class="card bid-holder">
-                                <div class="card-body">
-                                    
                                     <form class="row" action="{% url 'listing' listing.id %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="type" value="bid">
                                         <div class="form-inline">
-                                            <label>Place a bid (of at least ${{ current_bid }}):</label>
-                                            <input type="number" step=".01" min="{{ current_bid }}" class="form-control" required name="value"></input>
+                                            <input type="number" step=".01" min="{{ current_bid }}" class="form-control" style="width: 27em" required name="value" placeholder="Place a bid (of at least ${{ current_bid }})"></input>
                                         </div>
                                         <div class="d-flex align-items-end">
                                             <button class="submit-comment btn btn-primary" type="submit">Submit</button>
                                         </div>
                                     </form>
-                                
-                                </div>
-                            </div>
                         {% endif %}
-                        
+                        <br/>
+                        <ul>
+                            <li>Listed by: <b>{{ listing.user.username }}</b></li>
+                            <li>Category: <a href="{% url 'choice' category %}"><b><u>{{ name }}</u></b></a></li>
+                        </ul>
                         {% if user_is_winner %}
                             <div class="alert alert-success show" role="alert">Your bid was the winner! Your last bid was {{ current_bid }}</div>
-                        {% endif %}
-                    
+                        {% endif %}         
                     </div>
                 </div>
             </div>
         </div>
     </main>
     <hr class="soften">
-    <div class="col-md-6 mb-4">
-        <h3>Details:</h3>
-        <ul>
-            <li>Listed by: <b>{{ user.username }}</b></li>
-            <!--<a href="{% url 'category' listing.category.id %}"><li>Category: <b>{{ listing.category }</b></li>}</a>-->
-        </ul>                
-    </div>
     <div  class="col-md-6 mb-4">
         <h3>Comments:</h3>
         <ul>
-            <div class="card-footer">
-                {% for comment in listing.comments.all %}
-                    <li>{{ comment.user.username }} commented:<br>{{ comment.comment }}</li>
+            {% for comment in listing.comments.all %}
+                <div class="alert alert-dark" role="alert">
+                    <li>{{ comment.comment }} <br><cite class="text-danger">- {{comment.user.username}}</cite></li>
                 {% empty %}
                     No Comments yet!
-                {% endfor %}
-            </div>
+                </div>
+            {% endfor %}
         </ul>
-        
+        <br/>
         <form class="row" action="{% url 'listing' listing.id %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="type" value="comment">
             <div class="col-12 col-md-10">
-                <label>Comment</label>
                 <textarea type="text" class="form-control" required name="content" placeholder="Write your comment !"></textarea>
             </div>
             <div class="d-flex align-items-end">
                 <button class="submit-comment btn btn-primary" type="submit">Submit</button>
             </div>
         </form>
-        
+
         {% if comment_error %}
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
                 {{ comment_error }}
@@ -134,6 +124,3 @@
 
 
 
-    
-            
-        

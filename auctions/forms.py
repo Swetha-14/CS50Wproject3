@@ -6,7 +6,7 @@ class CreateForm(forms.ModelForm):
         model = Auctionlisting  
         fields = "__all__"
         exclude = ['created_date','active']
-        widgets = { #User
+        widgets = {
             'title' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Title'}),
             'description': forms.Textarea(attrs={'class':'form-control', 'placeholder':'Describe your product..'}),
             'starting_bid': forms.NumberInput(attrs={'class':'form-control'}),
